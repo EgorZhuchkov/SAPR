@@ -6,9 +6,11 @@
              xmlns:System="clr-namespace:System;assembly=mscorlib"
              xmlns:StrainAlias="clr-namespace:SAPR.ConstructionUtils"
              xmlns:local="clr-namespace:SAPR.ViewModels"
+             xmlns:Construction="clr-namespace:SAPR.ConstructionUtils"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" Background="White">
     <UserControl.Resources>
+        <local:EnumToCheckedConverter x:Key="SupportModeConverter" Type="{x:Type Construction:SupportMode}" />
         <Style TargetType="TextBox">
             <Setter Property="MinWidth" Value="15"/>
             <Setter Property="Margin" Value="0 0 10 0"/>
@@ -106,10 +108,16 @@
                 </ListBox.ItemTemplate>
             </ListBox>
 
-            <UniformGrid Grid.Row="4" Columns="2">
+            <!--<UniformGrid Grid.Row="4" Columns="2">
                 <CheckBox Content="Опора справа" HorizontalAlignment="Right" IsChecked="{Binding Path=HasRightSupport, Mode=TwoWay}"/>
-                <CheckBox Content="Опора слева" HorizontalAlignment="Left" IsChecked="{Binding Path=HasLeftSupport, Mode=TwoWay}" />
-            </UniformGrid>
+                <CheckBox Content="Опора слева" HorizontalAlignment="Left" IsChecked="{Binding Path=HasLeftSupport, Mode=TwoWay}"/>
+            </UniformGrid>-->
+
+            <StackPanel Orientation="Horizontal" Grid.Row="4" HorizontalAlignment="Center">
+                <RadioButton IsChecked="{Binding SupportMode, Converter={StaticResource SupportModeConverter}, ConverterParameter=Left}" Content="Left" Margin="5 0"/>
+                <RadioButton IsChecked="{Binding SupportMode, Converter={StaticResource SupportModeConverter}, ConverterParameter=Right}" Content="Rigth" Margin="5 0"/>
+                <RadioButton IsChecked="{Binding SupportMode, Converter={StaticResource SupportModeConverter}, ConverterParameter=Both}" Content="Both" Margin="5 0"/>
+            </StackPanel>
 
         </Grid>
 

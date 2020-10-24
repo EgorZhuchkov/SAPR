@@ -10,10 +10,18 @@ using System.Windows;
 
 namespace SAPR.ViewModels
 {
-    class PreprocessorViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
+    class PreprocessorViewModel : INotifyPropertyChanged
     {
-        private readonly Dictionary<string, List<string>> _errorsByPropertyName = new Dictionary<string, List<string>>();
-        public bool HasErrors => _errorsByPropertyName.Any();
+        private SupportMode supportMode;
+        public SupportMode SupportMode
+        {
+            get { return supportMode; }
+            set
+            {
+                supportMode = value;
+                OnPropertyChanged("SupportMode");
+            }
+        } 
 
         private bool hasRightSupport;
         private bool hasLeftSupport;
@@ -130,7 +138,7 @@ namespace SAPR.ViewModels
                 return _testCommand ??
                   (_testCommand = new RelayCommand(obj =>
                   {
-                      MessageBox.Show($"Construction: {construction.Rods[1].Length}");
+                      MessageBox.Show($"{SupportMode}");
                   }));
             }
         }
@@ -170,13 +178,6 @@ namespace SAPR.ViewModels
         {
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(prop));
-        }
-
-
-        public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
-        public IEnumerable GetErrors(string propertyName)
-        {
-            throw new NotImplementedException();
         }
     }
 }
