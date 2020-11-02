@@ -1,13 +1,17 @@
-﻿using System.ComponentModel;
+﻿using Microsoft.Win32;
+using SAPR.ConstructionUtils;
+using System;
+using System.ComponentModel;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 
 namespace SAPR.ViewModels
 {
     class ApplicationViewModel : INotifyPropertyChanged
     {
+        private Construction construction;
         private PreprocessorViewModel _preprocessorViewModel;
         
         private IInputElement _currentFocus;
@@ -17,7 +21,7 @@ namespace SAPR.ViewModels
             set
             {
                 _currentFocus = value;
-                OnPropertyChanged("CurrentModeTemplate");
+                OnPropertyChanged("CurrentFocus");
             }
         }
 
@@ -30,6 +34,12 @@ namespace SAPR.ViewModels
                 _currentModeTemplate = value;
                 OnPropertyChanged("CurrentModeTemplate");
             }
+        }
+
+        public ApplicationViewModel()
+        {
+            _preprocessorViewModel = new PreprocessorViewModel();
+            SwitchToPanel(new Preprocessor(), _preprocessorViewModel);
         }
 
         private RelayCommand _preprocessorCommand;
@@ -73,6 +83,20 @@ namespace SAPR.ViewModels
             }
         }
 
+        private RelayCommand _saveCommand;
+        public RelayCommand SaveCommand
+        {
+            get
+            {
+                return _saveCommand ??
+                  (_saveCommand = new RelayCommand(obj =>
+                  {
+                      SaveConstrictionToFile();
+                  },
+                  (obj) => !_preprocessorViewModel.HasErrors));
+            }
+        }
+
         private RelayCommand _exitCommand;
         public RelayCommand ExitCommand
         {
@@ -86,18 +110,19 @@ namespace SAPR.ViewModels
             }
         }
 
-        public ApplicationViewModel()
-        {
-            _preprocessorViewModel = new PreprocessorViewModel();
-            SwitchToPanel(new Preprocessor(), _preprocessorViewModel);
-        }
-
         private void SwitchToPanel(UserControl control, object viewModel)
         {
             CurrentModeTemplate = control;
             CurrentModeTemplate.DataContext = viewModel;
             CurrentModeTemplate.Focusable = true;
             CurrentFocus = CurrentModeTemplate;
+        }
+
+        private void SaveConstrictionToFile()
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            if (saveFileDialog.ShowDialog() == true)
+                File.WriteAllText(saveFileDialog.FileName, "Hello");
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

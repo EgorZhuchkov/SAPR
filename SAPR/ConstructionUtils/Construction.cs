@@ -11,12 +11,10 @@ namespace SAPR.ConstructionUtils
         public bool HasRightSupport;
         public bool HasLeftSupport;
 
-        public void Update(List<Rod> newRods, List<Strain> newStrains, bool rightSupport, bool leftSupport)
+        public void Update(List<Rod> newRods, List<Strain> newStrains)
         {
             Rods = newRods;
             Strains = newStrains;
-            HasRightSupport = rightSupport;
-            HasLeftSupport = leftSupport;
         }
     }
 }

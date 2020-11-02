@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace SAPR.ConstructionUtils
 {
-    class Rod : INotifyPropertyChanged, IDataErrorInfo
+    class Rod : INotifyPropertyChanged
     {
         private int index;
         private float length;
@@ -60,38 +60,6 @@ namespace SAPR.ConstructionUtils
                 OnPropertyChanged("AllowedStress");
             }
         }
-
-        public string this[string columnName]
-        {
-            get
-            {
-                string error = string.Empty;
-                switch (columnName)
-                {
-                    case "Length":
-                        if (Length < 0)
-                        {
-                            error = "Длина не должна быть меньше 0";
-                        }
-                        break;
-                    case "Elasticity":
-                        if (Elasticity < 0)
-                        {
-                            error = "Модуль упругости не должен быть меньше 0";
-                        }
-                        break;
-                    case "AllowedStress":
-                        if (AllowedStress < 0)
-                        {
-                            error = "Допускаемое напряжение не должно быть меньше 0";
-                        }
-                        break;
-                }
-                return error;
-            }
-        }
-
-        public string Error => throw new System.NotImplementedException();
 
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged([CallerMemberName] string prop = "")
