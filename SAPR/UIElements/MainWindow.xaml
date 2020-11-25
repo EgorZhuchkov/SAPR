@@ -7,6 +7,9 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
         FocusManager.FocusedElement="{Binding CurrentFocus}">
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding SaveCommand}" Modifiers="Control" Key="S"/>
+    </Window.InputBindings>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -24,10 +27,10 @@
 
         <Menu VerticalAlignment="Top">
             <MenuItem Header="File">
-                <MenuItem Header="New Project" />
-                <MenuItem Header="Open Project" />
+                <MenuItem Header="New Project" Command="{Binding NewProjectCommand}"/>
+                <MenuItem Header="Open Project" Command="{Binding OpenCommand}"/>
                 <MenuItem Header="Save Project" Command="{Binding SaveCommand}" />
-                <MenuItem Header="Save Project as" />
+                <MenuItem Header="Save Project as" Command="{Binding SaveAsCommand}"/>
                 <Separator />
                 <MenuItem Header="Exit" Command="{Binding ExitCommand}"/>
             </MenuItem>

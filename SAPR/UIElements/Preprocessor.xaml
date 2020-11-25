@@ -121,8 +121,10 @@
             
         </Grid>
 
-        <GridSplitter Grid.Column="1" Width="2" HorizontalAlignment="Center" VerticalAlignment="Stretch">
-            
-        </GridSplitter>
+        <GridSplitter Grid.Column="1" Width="2" HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
+
+        <Canvas Grid.Column="2" Background="White">
+            <ContentPresenter Content="{Binding ConstructionCanvas}"/>
+        </Canvas>
     </Grid>
 </UserControl>

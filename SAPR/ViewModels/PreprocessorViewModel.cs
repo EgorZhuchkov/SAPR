@@ -6,13 +6,23 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Controls.Ribbon;
+using System.Windows.Media;
+using System.Windows.Shapes;
 using SAPR.ConstructionUtils;
 
 namespace SAPR.ViewModels
 {
     class PreprocessorViewModel : INotifyPropertyChanged
     {
+        private Construction _cachedConstruction;
+        private Canvas constructionCanvas;
+        public Canvas ConstructionCanvas
+        {
+            get { return constructionCanvas; }
+        }
+
         private SupportMode supportMode;
         private List<string> errors;
         private bool hasErrors = false;
@@ -24,7 +34,7 @@ namespace SAPR.ViewModels
         
         public ObservableCollection<Rod> Rods { get; set; }
         public ObservableCollection<Strain> Strains { get; set; }
-        public SupportMode SupportMode
+        public SupportMode SupportsMode
         {
             get { return supportMode; }
             set
@@ -34,20 +44,35 @@ namespace SAPR.ViewModels
             }
         }
 
-        public PreprocessorViewModel()
+        public PreprocessorViewModel(Construction construction)
         {
-
-            Rods = new ObservableCollection<Rod>
-            {
-                new Rod { Length = 10.0f, AllowedStress = 5.0f, Area = 20.0f, Elasticity = 2.0f, Index = 1}
-            };
-            Strains = new ObservableCollection<Strain>
-            {
-                new Strain {NodeIndex = 1, Magnitude  = 10.0f, StrainType = StrainType.Lengthwise, Index = 1}
-            };
+            _cachedConstruction = construction;
+            Rods = new ObservableCollection<Rod>(_cachedConstruction.Rods);
+            Strains = new ObservableCollection<Strain>(_cachedConstruction.Strains);
             errors = new List<string>();
-            Rods[0].PropertyChanged += Rod_PropertyChangedCallback;
-            Strains[0].PropertyChanged += Rod_PropertyChangedCallback;
+
+            if(_cachedConstruction.HasRightSupport && _cachedConstruction.HasLeftSupport)
+            {
+                SupportsMode = SupportMode.Both;
+            }
+            else if(_cachedConstruction.HasRightSupport)
+            {
+                SupportsMode = SupportMode.Right;
+            }
+            else if (_cachedConstruction.HasLeftSupport)
+            {
+                SupportsMode = SupportMode.Left;
+            }
+
+            foreach (var rod in Rods)
+            {
+                rod.PropertyChanged += Construction_PropertyChangedCallback;
+            }
+            foreach (var strain in Strains)
+            {
+                strain.PropertyChanged += Construction_PropertyChangedCallback;
+            }
+           
             UpdateConstruction();
         }
 
@@ -62,7 +87,7 @@ namespace SAPR.ViewModels
                   {
                       var rod = new Rod { Index = Rods.Count + 1 };
                       Rods.Add(rod);
-                      rod.PropertyChanged += Rod_PropertyChangedCallback;
+                      rod.PropertyChanged += Construction_PropertyChangedCallback;
                       UpdateConstruction();
                   }));
             }
@@ -102,7 +127,7 @@ namespace SAPR.ViewModels
                   {
                       var strain = new Strain { Index = Strains.Count + 1 };
                       Strains.Add(strain);
-                      strain.PropertyChanged += Rod_PropertyChangedCallback;
+                      strain.PropertyChanged += Construction_PropertyChangedCallback;
                       UpdateConstruction();
                   }));
             }
@@ -147,20 +172,26 @@ namespace SAPR.ViewModels
         #endregion
 
 
-        public void Rod_PropertyChangedCallback(object sender, PropertyChangedEventArgs e)
+        public void Construction_PropertyChangedCallback(object sender, PropertyChangedEventArgs e)
         {
             UpdateConstruction();
         }
 
         private void UpdateConstruction()
         {
-            //MessageBox.Show("Construction updated");
             ValidateConstruction();
+            UpdateConstructionCanvas();
+            UpdateMainConstruction();
         }
 
         private void ValidateConstruction()
         {
             errors.Clear();
+
+            if(Rods.Count == 0)
+            {
+                errors.Add("В конструкции отсутствуют стержни");
+            }
 
             for (int i = 0; i < Rods.Count; i++)
             {
@@ -187,7 +218,7 @@ namespace SAPR.ViewModels
 
             for (int i = 0; i < Strains.Count; i++)
             {
-                if (Strains[i].Magnitude <= 0)
+                if (Math.Abs(Strains[i].Magnitude) < Double.Epsilon)
                 {
                     errors.Add($"Нагрузка должна иметь значение больше 0. [Нагрузка {i + 1}]");
                 }
@@ -198,7 +229,7 @@ namespace SAPR.ViewModels
 
             foreach (var strain in concentratedStrains)
             {
-                if ((strain.NodeIndex < 1) || (strain.NodeIndex > Rods.Count + 1))
+                if ((strain.NodeIndex <= 0) || (strain.NodeIndex > Rods.Count + 1))
                 {
                     errors.Add($"Сосредоточенные нагрузки должны прикладываться к существующим узлам. [Нагрузка {Strains.IndexOf(strain) + 1}]");
                 }
@@ -238,7 +269,7 @@ namespace SAPR.ViewModels
 
             foreach (var strain in lengthwiseStrains)
             {
-                if ((strain.NodeIndex < 1) || (strain.NodeIndex > Rods.Count))
+                if ((strain.NodeIndex <= 0) || (strain.NodeIndex > Rods.Count))
                 {
                     errors.Add($"Продольные нагрузки должны прикладываться к существующим стержням. [Нагрузка {Strains.IndexOf(strain) + 1}]");
                 }
@@ -261,6 +292,44 @@ namespace SAPR.ViewModels
 
             hasErrors = errors.Any();
             OnPropertyChanged("Errors");
+        }
+
+        private void UpdateConstructionCanvas()
+        {
+            constructionCanvas = new Canvas();
+
+            if (errors.Count == 0)
+            {
+                DrawConstruction();
+            }
+
+            OnPropertyChanged("ConstructionCanvas");
+        }
+
+        private void UpdateMainConstruction()
+        {
+            _cachedConstruction.Rods = Rods.ToList<Rod>();
+            _cachedConstruction.Strains = Strains.ToList<Strain>();
+            _cachedConstruction.HasLeftSupport = (SupportsMode == SupportMode.Both || SupportsMode == SupportMode.Left);
+            _cachedConstruction.HasRightSupport = (SupportsMode == SupportMode.Both || SupportsMode == SupportMode.Right);
+        }
+
+        private void DrawConstruction()
+        {
+            var leftSupport = new Path()
+            {
+                Data = Geometry.Parse(
+                                                "M 0 10 L 10 0 M 0 20 L 10 10 M 0 30 L 10 20 M 0 40 L 10 30 M 0 50 L 10 40 M 0 60 L 10 50 M 0 70 L 10 60 M 0 80 L 10 70 M 10 0 L 10 70"),
+                Stroke = Brushes.Black,
+                StrokeThickness = 1,
+                RenderTransformOrigin = Point.Parse("0,0"),
+                RenderTransform = new ScaleTransform(1, 1)
+            };
+
+            Canvas.SetLeft(leftSupport, 50 - 10);
+            Canvas.SetTop(leftSupport, constructionCanvas.Height / 2 - 45);
+
+            constructionCanvas.Children.Add(leftSupport);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
