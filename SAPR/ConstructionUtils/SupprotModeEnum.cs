@@ -1,6 +1,6 @@
 ﻿namespace SAPR.ConstructionUtils
 {
-    enum SupportMode
+    public enum SupportMode
     {
         Left, Right, Both
     }

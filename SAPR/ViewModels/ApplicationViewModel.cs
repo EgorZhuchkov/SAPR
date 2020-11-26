@@ -204,7 +204,7 @@ namespace SAPR.ViewModels
                 _construction = JsonConvert.DeserializeObject<Construction>(serializedConstruction);
                 _currentFilePath = openFileDialog.FileName;
 
-                _preprocessorViewModel = new PreprocessorViewModel(_construction);
+                _preprocessorViewModel.UpdatePreprocessor(_construction);
                 SwitchToPanel(new Preprocessor(), _preprocessorViewModel);
             }
         }
@@ -214,7 +214,7 @@ namespace SAPR.ViewModels
             _currentFilePath = null;
             _construction = new Construction();
 
-            _preprocessorViewModel = new PreprocessorViewModel(_construction);
+            _preprocessorViewModel.UpdatePreprocessor(_construction);
             SwitchToPanel(new Preprocessor(), _preprocessorViewModel);
         }
 

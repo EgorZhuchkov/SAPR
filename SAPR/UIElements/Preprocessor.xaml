@@ -110,9 +110,10 @@
             </ListBox>
 
             <StackPanel Orientation="Horizontal" Grid.Row="4" HorizontalAlignment="Center">
-                <RadioButton IsChecked="{Binding SupportMode, Converter={StaticResource SupportModeConverter}, ConverterParameter=Left}" Content="Left" Margin="5 0"/>
-                <RadioButton IsChecked="{Binding SupportMode, Converter={StaticResource SupportModeConverter}, ConverterParameter=Right}" Content="Rigth" Margin="5 0"/>
-                <RadioButton IsChecked="{Binding SupportMode, Converter={StaticResource SupportModeConverter}, ConverterParameter=Both}" Content="Both" Margin="5 0"/>
+                <RadioButton IsChecked="{Binding SupportsMode, Converter={StaticResource SupportModeConverter}, ConverterParameter=Left}" Content="Left" Margin="5 0"/>
+                <RadioButton IsChecked="{Binding SupportsMode, Converter={StaticResource SupportModeConverter}, ConverterParameter=Right}" Content="Rigth" Margin="5 0"/>
+                <RadioButton IsChecked="{Binding SupportsMode, Converter={StaticResource SupportModeConverter}, ConverterParameter=Both}" Content="Both" Margin="5 0"/>
+                <Button Command="{Binding TestCommand}" Width="10"/>
             </StackPanel>
 
             <ScrollViewer Grid.Row="5" VerticalScrollBarVisibility="Visible">
@@ -123,8 +124,6 @@
 
         <GridSplitter Grid.Column="1" Width="2" HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
 
-        <Canvas Grid.Column="2" Background="White">
-            <ContentPresenter Content="{Binding ConstructionCanvas}"/>
-        </Canvas>
+        <UserControl Grid.Column="2" Content="{Binding UC_ConstructionCanvas}"/>
     </Grid>
 </UserControl>

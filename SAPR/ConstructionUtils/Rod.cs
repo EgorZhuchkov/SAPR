@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace SAPR.ConstructionUtils
 {
-    class Rod : INotifyPropertyChanged
+    public class Rod : INotifyPropertyChanged
     {
         private int index;
         private float length;

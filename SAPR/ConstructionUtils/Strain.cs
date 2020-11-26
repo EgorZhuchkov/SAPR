@@ -6,9 +6,9 @@ using System.Text;
 
 namespace SAPR.ConstructionUtils
 {
-    enum StrainType { Concentrated, Lengthwise }
+    public enum StrainType { Concentrated, Lengthwise }
 
-    class Strain : INotifyPropertyChanged
+    public class Strain : INotifyPropertyChanged
     {
         private int index;
         private int nodeIndex;
