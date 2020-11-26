@@ -123,7 +123,15 @@ namespace SAPR.ViewModels
                 return _addRodCommand ??
                   (_addRodCommand = new RelayCommand(obj =>
                   {
-                      var rod = new Rod { Index = Rods.Count + 1 };
+                      var rod = new Rod
+                      {
+                          Index = Rods.Count + 1,
+                          Length = 1.0f,
+                          Area = 1.0f,
+                          Elasticity = 1.0f,
+                          AllowedStress = 1.0f
+
+                      };
                       Rods.Add(rod);
                       rod.PropertyChanged += Construction_PropertyChangedCallback;
                       UpdateConstruction();
@@ -163,7 +171,12 @@ namespace SAPR.ViewModels
                 return _addStrainCommand ??
                   (_addStrainCommand = new RelayCommand(obj =>
                   {
-                      var strain = new Strain { Index = Strains.Count + 1 };
+                      var strain = new Strain
+                      {
+                          Index = Strains.Count + 1,
+                          Magnitude = 1.0f,
+                          NodeIndex = 1
+                      };
                       Strains.Add(strain);
                       strain.PropertyChanged += Construction_PropertyChangedCallback;
                       UpdateConstruction();
@@ -218,7 +231,6 @@ namespace SAPR.ViewModels
         private void UpdateConstruction()
         {
             ValidateConstruction();
-            //UpdateConstructionCanvas();
             if(errors.Count == 0)
             {
                 UC_ConstructionCanvas.DrawConstruction(supportMode);
@@ -342,18 +354,6 @@ namespace SAPR.ViewModels
             OnPropertyChanged("Errors");
         }
 
-        //private void UpdateConstructionCanvas()
-        //{
-        //    constructionCanvas = new Canvas();
-
-        //    if (errors.Count == 0)
-        //    {
-        //        DrawConstruction();
-        //    }
-
-        //    OnPropertyChanged("ConstructionCanvas");
-        //}
-
         private void UpdateMainConstruction()
         {
             _cachedConstruction.Rods = Rods.ToList<Rod>();
@@ -361,72 +361,6 @@ namespace SAPR.ViewModels
             _cachedConstruction.HasLeftSupport = (SupportsMode == SupportMode.Both || SupportsMode == SupportMode.Left);
             _cachedConstruction.HasRightSupport = (SupportsMode == SupportMode.Both || SupportsMode == SupportMode.Right);
         }
-
-        //private void DrawConstruction()
-        //{
-        //    var height = constructionCanvas.Height;
-        //    var width = constructionCanvas.Width;
-
-        //    const int heightOffset = 50;
-        //    const int widthOffset = 50;
-
-        //    var rodsTotalLength = Rods.ToList().Select(rod => rod.Length).Sum();
-        //    var rodsMaxArea = Rods.ToList().Select(rod => rod.Area).Max();
-
-        //    var rectangleWidth = rodsTotalLength / (width - 2 * widthOffset);
-        //    var rectangleHeight = rodsMaxArea / (height - 3 * heightOffset);
-
-        //    double currentOffset = widthOffset;
-
-        //    #region Supports
-
-        //    var leftSupport = new Path()
-        //    {
-        //        Data = Geometry.Parse("M 0 10 L 10 0 M 0 20 L 10 10 M 0 30 L 10 20 M 0 40 L 10 30 M 0 50 L 10 40 M 0 60 L 10 50 M 0 70 L 10 60 M 0 80 L 10 70 M 10 0 L 10 70"),
-        //        Stroke = Brushes.Black,
-        //        StrokeThickness = 1,
-        //        RenderTransform = new ScaleTransform(1, 1)
-        //    };
-
-        //    Canvas.SetLeft(leftSupport, currentOffset - 10);
-        //    Canvas.SetTop(leftSupport, height / 2 - 45);
-
-        //    var rightSupport = new Path()
-        //    {
-        //        Data = Geometry.Parse("M 0 10 L 10 0 M 0 20 L 10 10 M 0 30 L 10 20 M 0 40 L 10 30 M 0 50 L 10 40 M 0 60 L 10 50 M 0 70 L 10 60 M 0 80 L 10 70 M 10 0 L 10 70"),
-        //        Stroke = Brushes.Black,
-        //        StrokeThickness = 1,
-        //        RenderTransform = new TransformGroup()
-        //        {
-        //            Children = {
-        //                new ScaleTransform(1, 1),
-        //                new RotateTransform(180)
-        //            }
-        //        }
-        //    };
-
-        //    Canvas.SetRight(rightSupport, currentOffset - 25);
-        //    Canvas.SetTop(rightSupport, height / 2 - 45);
-
-        //    if (SupportsMode == SupportMode.Both)
-        //    {
-        //        constructionCanvas.Children.Add(leftSupport);
-        //        constructionCanvas.Children.Add(rightSupport);
-        //    }
-        //    else if(SupportsMode == SupportMode.Left)
-        //    {
-        //        constructionCanvas.Children.Add(leftSupport);
-        //    }
-        //    else
-        //    {
-        //        constructionCanvas.Children.Add(rightSupport);
-        //    }
-
-        //    #endregion
-
-
-
-        //}
 
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged([CallerMemberName] string prop = "")

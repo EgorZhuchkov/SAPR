@@ -71,13 +71,14 @@ namespace SAPR.UIElements
             var rodsTotalLength = _rods.ToList().Select(rod => rod.Length).Sum();
             var rodsMaxArea = _rods.ToList().Select(rod => rod.Area).Max();
 
+            var rodsMinWidth = _rods.ToList().Select(rod => rod.Length).Min();
+            var rodsMinHeight = _rods.ToList().Select(rod => rod.Area).Min();
+
             var rectangleWidthDevisor = rodsTotalLength / (width - 2 * widthOffset);
             var rectangleHeightDevisor = rodsMaxArea / (height - 2 * heightOffset);
 
             double currentOffset = widthOffset;
             var numberOfArrows = 8;
-
-            var lastRodWidth = 0.0d;
 
             #region Supports
 
@@ -120,12 +121,12 @@ namespace SAPR.UIElements
 
             for (int i = 0; i < _rods.Count; i++)
             {
-                var rodWidth = Math.Clamp(_rods[i].Length / rectangleWidthDevisor, 1.0f, float.MaxValue);
-                var rodHeight = Math.Clamp(_rods[i].Area / rectangleHeightDevisor, 1.0f, float.MaxValue);
+                var rodWidth = Math.Clamp(_rods[i].Length / rectangleWidthDevisor, 10.0f, float.MaxValue);
+                var rodHeight = Math.Clamp(_rods[i].Area / rectangleHeightDevisor, 10.0f, float.MaxValue);
 
                 var rodRectangle = new Rectangle()
                 {
-                    Height = rodHeight,
+                    Height = Math.Clamp(rodHeight, 10.0f, float.MaxValue),
                     Width = rodWidth,
                     Stroke = Brushes.Black,
                     Fill = Brushes.LightGray
@@ -144,7 +145,7 @@ namespace SAPR.UIElements
                         var strainArrow = new Path
                         {
                             Data = Geometry.Parse("M 0,115 60,115 35,90 100,120 35,150 60,125 0,125 Z"),
-                            Height = 10 * heightModifier,
+                            Height = Math.Clamp(rodHeight / 10, 5.0f, float.MaxValue),
                             Width = rodWidth / numberOfArrows,
                             RenderTransformOrigin = Point.Parse(".5,.5"),
                             RenderTransform = strain.Magnitude < 0 ? new RotateTransform(180) : new RotateTransform(0),
@@ -171,23 +172,19 @@ namespace SAPR.UIElements
                     var strainArrow = new Path
                     {
                         Data = Geometry.Parse("M 0,115 60,115 35,90 100,120 35,150 60,125 0,125 Z"),
-                        Height = 25 * heightModifier,
-                        Width = 40 * widthModifier,
+                        Height = Math.Clamp((rodsMinHeight / rectangleHeightDevisor) / 3, 5.0f, float.MaxValue),
+                        Width = Math.Clamp((rodsMinWidth / rectangleWidthDevisor) / 3, 5.0f, widthOffset - 5.0f),
                         RenderTransformOrigin = Point.Parse("0,.5"),
                         RenderTransform = strain.Magnitude < 0 ? new RotateTransform(180) : new RotateTransform(0),
                         Stretch = Stretch.Fill,
-                        Fill = strain.Magnitude < 0 ? Brushes.Blue : Brushes.Red
+                        Fill = strain.Magnitude < 0 ? Brushes.BlueViolet : Brushes.OrangeRed,
+                        Stroke = strain.Magnitude < 0 ? Brushes.DarkViolet : Brushes.DarkOrange
                     };
 
                     Canvas.SetLeft(strainArrow, currentOffset);
                     Canvas.SetTop(strainArrow, height / 2 - strainArrow.Height / 2);
 
                     ConstructionCanvasUI.Children.Add(strainArrow);
-                }
-
-                if(i == _rods.Count - 1)
-                {
-                    lastRodWidth = rodWidth;
                 }
 
                 currentOffset += rodWidth;
@@ -207,12 +204,13 @@ namespace SAPR.UIElements
                     var strainArrow = new Path
                     {
                         Data = Geometry.Parse("M 0,115 60,115 35,90 100,120 35,150 60,125 0,125 Z"),
-                        Height = 25 * heightModifier,
-                        Width = 40 * widthModifier,
+                        Height = Math.Clamp((rodsMinHeight / rectangleHeightDevisor) / 3, 1.0f, float.MaxValue),
+                        Width = Math.Clamp((rodsMinWidth / rectangleWidthDevisor) / 3, 1.0f, widthOffset - 5.0f),
                         RenderTransformOrigin = Point.Parse("0,.5"),
                         RenderTransform = strain.Magnitude < 0 ? new RotateTransform(180) : new RotateTransform(0),
                         Stretch = Stretch.Fill,
-                        Fill = strain.Magnitude < 0 ? Brushes.Blue : Brushes.Red
+                        Fill = strain.Magnitude < 0 ? Brushes.BlueViolet : Brushes.OrangeRed,
+                        Stroke = strain.Magnitude < 0 ? Brushes.DarkViolet : Brushes.DarkOrange
                     };
 
                     Canvas.SetLeft(strainArrow, currentOffset);
