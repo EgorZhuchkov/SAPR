@@ -6,7 +6,13 @@ using System.Text;
 
 namespace SAPR.ConstructionUtils
 {
-    public enum StrainType { Concentrated, Lengthwise }
+    public enum StrainType 
+    {
+        [Description("Сосредоточенная")]
+        Concentrated,
+        [Description("Распределенная")]
+        Lengthwise 
+    }
 
     public class Strain : INotifyPropertyChanged
     {

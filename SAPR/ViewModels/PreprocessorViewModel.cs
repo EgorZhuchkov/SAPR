@@ -279,7 +279,7 @@ namespace SAPR.ViewModels
             {
                 if (Math.Abs(Strains[i].Magnitude) < Double.Epsilon)
                 {
-                    errors.Add($"Нагрузка должна иметь значение больше 0. [Нагрузка {i + 1}]");
+                    errors.Add($"Нагрузка должна иметь значение не равное 0. [Нагрузка {i + 1}]");
                 }
             }
 

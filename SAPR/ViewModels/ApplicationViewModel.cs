@@ -7,6 +7,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
+using SAPR.UIElements;
 
 namespace SAPR.ViewModels
 {
@@ -15,6 +16,7 @@ namespace SAPR.ViewModels
         private Construction _construction = null;
         private string _currentFilePath = null;
         private PreprocessorViewModel _preprocessorViewModel = null;
+        private ProcessorViewModel _processorViewModel = null;
 
         public UserControl _currentModeTemplate;
         public UserControl CurrentModeTemplate
@@ -31,6 +33,7 @@ namespace SAPR.ViewModels
         {
             _construction = new Construction();
             _preprocessorViewModel = new PreprocessorViewModel(_construction);
+            _processorViewModel = new ProcessorViewModel(_construction);
             SwitchToPanel(new Preprocessor(), _preprocessorViewModel);
         }
 
@@ -70,8 +73,7 @@ namespace SAPR.ViewModels
                 return _processorCommand ??
                   (_processorCommand = new RelayCommand(o =>
                   {
-                      MessageBox.Show("Not yet implemented");
-                      //CurrentModeTemplate = new Processor();
+                      SwitchToPanel(new Processor(), _processorViewModel);
                   }));
             }
         }

@@ -129,7 +129,8 @@ namespace SAPR.UIElements
                     Height = Math.Clamp(rodHeight, 10.0f, float.MaxValue),
                     Width = rodWidth,
                     Stroke = Brushes.Black,
-                    Fill = Brushes.LightGray
+                    Fill = Brushes.LightGray,
+                    ToolTip = $"Длина = {_rods[i].Length}, площадь = {_rods[i].Area}, модуль упругости = {_rods[i].Elasticity}, допускаемое напряжение = {_rods[i].AllowedStress}"
                 };
 
                 Canvas.SetTop(rodRectangle, height / 2 - rodHeight / 2);
@@ -150,7 +151,8 @@ namespace SAPR.UIElements
                             RenderTransformOrigin = Point.Parse(".5,.5"),
                             RenderTransform = strain.Magnitude < 0 ? new RotateTransform(180) : new RotateTransform(0),
                             Stretch = Stretch.Fill,
-                            Fill = strain.Magnitude < 0 ? Brushes.DarkBlue : Brushes.DarkRed
+                            Fill = strain.Magnitude < 0 ? Brushes.DarkBlue : Brushes.DarkRed,
+                            ToolTip = strain.Magnitude
                         };
 
                         Canvas.SetLeft(strainArrow, currentOffset + rodWidth / numberOfArrows * j);
@@ -178,7 +180,8 @@ namespace SAPR.UIElements
                         RenderTransform = strain.Magnitude < 0 ? new RotateTransform(180) : new RotateTransform(0),
                         Stretch = Stretch.Fill,
                         Fill = strain.Magnitude < 0 ? Brushes.BlueViolet : Brushes.OrangeRed,
-                        Stroke = strain.Magnitude < 0 ? Brushes.DarkViolet : Brushes.DarkOrange
+                        Stroke = strain.Magnitude < 0 ? Brushes.DarkViolet : Brushes.DarkOrange,
+                        ToolTip = strain.Magnitude
                     };
 
                     Canvas.SetLeft(strainArrow, currentOffset);
@@ -210,7 +213,8 @@ namespace SAPR.UIElements
                         RenderTransform = strain.Magnitude < 0 ? new RotateTransform(180) : new RotateTransform(0),
                         Stretch = Stretch.Fill,
                         Fill = strain.Magnitude < 0 ? Brushes.BlueViolet : Brushes.OrangeRed,
-                        Stroke = strain.Magnitude < 0 ? Brushes.DarkViolet : Brushes.DarkOrange
+                        Stroke = strain.Magnitude < 0 ? Brushes.DarkViolet : Brushes.DarkOrange,
+                        ToolTip = strain.Magnitude
                     };
 
                     Canvas.SetLeft(strainArrow, currentOffset);

@@ -7,9 +7,11 @@
              xmlns:StrainAlias="clr-namespace:SAPR.ConstructionUtils"
              xmlns:local="clr-namespace:SAPR.ViewModels"
              xmlns:Construction="clr-namespace:SAPR.ConstructionUtils"
+             xmlns:Converters="clr-namespace:SAPR.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" Background="White">
     <UserControl.Resources>
+        <Converters:EnumDescriptionConverter x:Key="EnumDescriptionConverter"/>
         <local:EnumToCheckedConverter x:Key="SupportModeConverter" Type="{x:Type Construction:SupportMode}" />
         <Style TargetType="TextBox">
             <Setter Property="MinWidth" Value="15"/>
@@ -35,10 +37,6 @@
         </ObjectDataProvider>
     </UserControl.Resources>
 
-    <UserControl.InputBindings>
-        <KeyBinding Command="{Binding TestCommand}" Key="F2" />
-    </UserControl.InputBindings>
-        
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0.5*"/>
@@ -74,7 +72,7 @@
                             <TextBox Text="{Binding Path=Elasticity}"/>
                             <TextBlock Text="Sigma = " />
                             <TextBox Text="{Binding Path=AllowedStress}"/>
-                            <Button Content="Del" Command="{Binding DataContext.RemoveRodCommand,
+                            <Button Content="Удалить" Command="{Binding DataContext.RemoveRodCommand,
                                 RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}" 
                                     CommandParameter="{Binding Path=DataContext,
                                 RelativeSource={RelativeSource Self}}" />
@@ -93,14 +91,20 @@
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{Binding StringFormat='{}{0}. ', Path=Index}"/>
-                            <TextBlock Text="Type = "/>
+                            <TextBlock Text="Тип = "/>
                             <ComboBox ItemsSource="{Binding Source={StaticResource strainTypeData}}" 
-                                      SelectedItem="{Binding Path=StrainType}"/>
-                            <TextBlock Text="Node = " Margin="10 0 0 0"/>
+                                      SelectedItem="{Binding Path=StrainType}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                            <TextBlock Text="Индекс = " Margin="10 0 0 0"/>
                             <TextBox Text="{Binding Path=NodeIndex}"/>
-                            <TextBlock Text="Value = " />
+                            <TextBlock Text="Значение = " />
                             <TextBox Text="{Binding Path=Magnitude}"/>
-                            <Button Content="Del" Command="{Binding DataContext.RemoveStrainCommand,
+                            <Button Content="Удалить" Command="{Binding DataContext.RemoveStrainCommand,
                                 RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}" 
                                     CommandParameter="{Binding Path=DataContext,
                                 RelativeSource={RelativeSource Self}}" />
@@ -109,12 +113,15 @@
                 </ListBox.ItemTemplate>
             </ListBox>
 
-            <StackPanel Orientation="Horizontal" Grid.Row="4" HorizontalAlignment="Center">
-                <RadioButton IsChecked="{Binding SupportsMode, Converter={StaticResource SupportModeConverter}, ConverterParameter=Left}" Content="Left" Margin="5 0"/>
-                <RadioButton IsChecked="{Binding SupportsMode, Converter={StaticResource SupportModeConverter}, ConverterParameter=Right}" Content="Rigth" Margin="5 0"/>
-                <RadioButton IsChecked="{Binding SupportsMode, Converter={StaticResource SupportModeConverter}, ConverterParameter=Both}" Content="Both" Margin="5 0"/>
-                <Button Command="{Binding TestCommand}" Width="10"/>
+            <StackPanel Orientation="Vertical" Grid.Row="4" HorizontalAlignment="Center">
+                <TextBlock Text="Заделки" HorizontalAlignment="Center"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <RadioButton IsChecked="{Binding SupportsMode, Converter={StaticResource SupportModeConverter}, ConverterParameter=Left}" Content="Слева" Margin="5 0"/>
+                    <RadioButton IsChecked="{Binding SupportsMode, Converter={StaticResource SupportModeConverter}, ConverterParameter=Right}" Content="Справа" Margin="5 0"/>
+                    <RadioButton IsChecked="{Binding SupportsMode, Converter={StaticResource SupportModeConverter}, ConverterParameter=Both}" Content="Обе" Margin="5 0"/>
+                </StackPanel>
             </StackPanel>
+            
 
             <ScrollViewer Grid.Row="5" VerticalScrollBarVisibility="Visible">
                 <TextBlock Text="{Binding Errors, Mode=OneWay}" Foreground="Red"/>
