@@ -231,10 +231,10 @@ namespace SAPR.ViewModels
         private void UpdateConstruction()
         {
             ValidateConstruction();
-            if(errors.Count == 0)
+            UpdateMainConstruction();
+            if (errors.Count == 0)
             {
                 UC_ConstructionCanvas.DrawConstruction(supportMode);
-                UpdateMainConstruction();
             }
             else
             {
@@ -356,6 +356,7 @@ namespace SAPR.ViewModels
 
         private void UpdateMainConstruction()
         {
+            _cachedConstruction.IsProcessed = false;
             _cachedConstruction.Rods = Rods.ToList<Rod>();
             _cachedConstruction.Strains = Strains.ToList<Strain>();
             _cachedConstruction.HasLeftSupport = (SupportsMode == SupportMode.Both || SupportsMode == SupportMode.Left);

@@ -61,6 +61,7 @@ namespace SAPR.ViewModels
                   (_preprocessorCommand = new RelayCommand(o =>
                   {
                       SwitchToPanel(new Preprocessor(), _preprocessorViewModel);
+                      _processorViewModel.IsActive = false;
                   }));
             }
         }
@@ -74,6 +75,7 @@ namespace SAPR.ViewModels
                   (_processorCommand = new RelayCommand(o =>
                   {
                       SwitchToPanel(new Processor(), _processorViewModel);
+                      _processorViewModel.IsActive = true;
                   }));
             }
         }
@@ -88,6 +90,7 @@ namespace SAPR.ViewModels
                   {
                       // CurrentModeTemplate = new Postprocessor();
                       MessageBox.Show("Not yet implemented");
+                      _processorViewModel.IsActive = false;
                   }));
             }
         }
@@ -102,7 +105,7 @@ namespace SAPR.ViewModels
                   {
                       SaveConstrictionToFile();
                   },
-                  (obj) => !_preprocessorViewModel.HasErrors));
+                  (obj) => _construction.IsValid()));
             }
         }
 

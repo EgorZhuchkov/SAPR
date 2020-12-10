@@ -11,6 +11,7 @@ namespace SAPR.ConstructionUtils
         public List<Strain> Strains;
         public bool HasRightSupport;
         public bool HasLeftSupport;
+        public bool IsProcessed;
 
         public Construction()
         {
