@@ -62,10 +62,7 @@ namespace SAPR.ConstructionUtils
 
         //public Strain(StrainType strainType, float magnitude, int index, int nodeIndex)
         //{
-        //    Index = index;
         //    StrainType = strainType;
-        //    Magnitude = magnitude;
-        //    NodeIndex = nodeIndex;
         //}
 
         public event PropertyChangedEventHandler PropertyChanged;

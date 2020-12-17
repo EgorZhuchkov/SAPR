@@ -210,6 +210,7 @@ namespace SAPR.ViewModels
                 _currentFilePath = openFileDialog.FileName;
 
                 _preprocessorViewModel.UpdatePreprocessor(_construction);
+                _processorViewModel.UpdateProcessor(_construction);
                 SwitchToPanel(new Preprocessor(), _preprocessorViewModel);
             }
         }
@@ -220,6 +221,7 @@ namespace SAPR.ViewModels
             _construction = new Construction();
 
             _preprocessorViewModel.UpdatePreprocessor(_construction);
+            _processorViewModel.UpdateProcessor(_construction);
             SwitchToPanel(new Preprocessor(), _preprocessorViewModel);
         }
 
