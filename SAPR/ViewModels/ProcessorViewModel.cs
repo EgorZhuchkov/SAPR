@@ -1,8 +1,10 @@
 ﻿using MathNet.Numerics.LinearAlgebra;
+using Microsoft.Win32;
 using SAPR.ConstructionUtils;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -13,6 +15,8 @@ namespace SAPR.ViewModels
     {
         public bool IsActive { set { OnPropertyChanged("ProcessorData"); } }
         private List<string> calculationReport = new List<string>();
+        private List<Strain> concentratedStrains;
+        private List<Strain> lengthwiseStrains;
 
         public string ProcessorData
         {
@@ -24,11 +28,11 @@ namespace SAPR.ViewModels
                 }
                 else if(cachedConstruction.IsValid())
                 {
-                    return "Please, process data";
+                    return "Данные не рассчитаны";
                 }
                 else
                 {
-                    return "Construction is not valid";
+                    return "Конструкция задана некорректно";
                 }
             }
         }
@@ -36,12 +40,21 @@ namespace SAPR.ViewModels
 
         public ProcessorViewModel(Construction construction)
         {
-            cachedConstruction = construction;
+            UpdateProcessor(construction);
         }
 
         public void UpdateProcessor(Construction construction)
         {
             cachedConstruction = construction;
+            concentratedStrains = cachedConstruction.Strains.Where(strain => strain.StrainType == StrainType.Concentrated).ToList();
+            concentratedStrains = ReshapeConcentratedStrains(concentratedStrains, cachedConstruction.Rods.Count);
+            lengthwiseStrains = cachedConstruction.Strains.Where(strain => strain.StrainType == StrainType.Lengthwise).ToList();
+            lengthwiseStrains = ReshapeLengthwiseStrains(lengthwiseStrains, cachedConstruction.Rods.Count);
+
+            if (cachedConstruction.IsProcessed)
+            {
+                CalculateResults();
+            }
         }
 
         #region Commands
@@ -67,7 +80,7 @@ namespace SAPR.ViewModels
                 return _saveResultsCommand ??
                   (_saveResultsCommand = new RelayCommand(obj =>
                   {
-                      MessageBox.Show("Not yet implemented");
+                      SaveReportToFile();
                   },
                   (obj) => cachedConstruction.IsProcessed));
             }
@@ -76,6 +89,7 @@ namespace SAPR.ViewModels
 
         private void CalculateResults()
         {
+            calculationReport.Clear();
             #region Reaction matrix
             var reactionMatrix = Matrix<double>.Build.Sparse(cachedConstruction.Rods.Count + 1, cachedConstruction.Rods.Count + 1, 0);
             
@@ -137,10 +151,6 @@ namespace SAPR.ViewModels
 
             #region Reaction vector
             var reactionVector = Vector<double>.Build.Sparse(cachedConstruction.Rods.Count + 1, 0);
-            var concentratedStrains = cachedConstruction.Strains.Where(strain => strain.StrainType == StrainType.Concentrated).ToList();
-            concentratedStrains = ReshapeConcentratedStrains(concentratedStrains, cachedConstruction.Rods.Count);
-            var lengthwiseStrains = cachedConstruction.Strains.Where(strain => strain.StrainType == StrainType.Lengthwise).ToList();
-            lengthwiseStrains = ReshapeLengthwiseStrains(lengthwiseStrains, cachedConstruction.Rods.Count);
 
             for (var i = 0; i < cachedConstruction.Rods.Count + 1; ++i)
             { 
@@ -205,6 +215,7 @@ namespace SAPR.ViewModels
             }
 
             calculationReport.Add($"Ux:\n{ux.ToMatrixString()}");
+            cachedConstruction.Ux = ux;
             #endregion
 
             #region Nx 
@@ -255,6 +266,41 @@ namespace SAPR.ViewModels
             }
 
             return result;
+        }
+
+        public double GetN(double x, int rod)
+        {
+            return (cachedConstruction.Rods[rod].Elasticity * cachedConstruction.Rods[rod].Area / cachedConstruction.Rods[rod].Length) * 
+                (cachedConstruction.Ux[rod, 1] - cachedConstruction.Ux[rod, 0]) + 
+                (lengthwiseStrains[rod].Magnitude * cachedConstruction.Rods[rod].Length / 2) * 
+                (1 - 2 * x / cachedConstruction.Rods[rod].Length);
+        }
+
+        public double GetU(double x, int rod)
+        {
+            return cachedConstruction.Ux[rod, 0] +
+                   (x / cachedConstruction.Rods[rod].Length) * 
+                   (cachedConstruction.Ux[rod, 1] - cachedConstruction.Ux[rod, 0]) +
+                   (lengthwiseStrains[rod].Magnitude * Math.Pow(cachedConstruction.Rods[rod].Length, 2)) / 
+                   (2 * cachedConstruction.Rods[rod].Elasticity * cachedConstruction.Rods[rod].Area) * 
+                   (x / cachedConstruction.Rods[rod].Length) * 
+                   (1 - x / cachedConstruction.Rods[rod].Length);
+        }
+
+        public double GetSigma(double x, int rod)
+        {
+            return GetN(x, rod) / cachedConstruction.Rods[rod].Length;
+        }
+
+        private void SaveReportToFile()
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                File.WriteAllText(saveFileDialog.FileName, ProcessorData);
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

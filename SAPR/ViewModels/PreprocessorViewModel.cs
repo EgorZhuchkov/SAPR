@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SAPR.ConstructionUtils;
+using SAPR.UIElements;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -6,12 +8,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Controls.Ribbon;
-using System.Windows.Media;
-using System.Windows.Shapes;
-using SAPR.ConstructionUtils;
-using SAPR.UIElements;
 
 namespace SAPR.ViewModels
 {
@@ -22,6 +18,7 @@ namespace SAPR.ViewModels
         private Construction _cachedConstruction;
         private SupportMode supportMode;
         private List<string> errors;
+        private bool isInited;
         private bool hasErrors = false;
         public bool HasErrors { get { return hasErrors; } }
         public string Errors
@@ -72,10 +69,12 @@ namespace SAPR.ViewModels
             {
                 strain.PropertyChanged += Construction_PropertyChangedCallback;
             }
+            isInited = true;
         }
 
         public void UpdatePreprocessor(Construction construction)
         {
+            isInited = false;
             _cachedConstruction = construction;
             Rods = new ObservableCollection<Rod>(_cachedConstruction.Rods);
             Strains = new ObservableCollection<Strain>(_cachedConstruction.Strains);
@@ -104,6 +103,7 @@ namespace SAPR.ViewModels
             {
                 strain.PropertyChanged += Construction_PropertyChangedCallback;
             }
+            isInited = true;
         }
 
         private void UC_ConstructionCanvas_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -356,7 +356,10 @@ namespace SAPR.ViewModels
 
         private void UpdateMainConstruction()
         {
-            _cachedConstruction.IsProcessed = false;
+            if(isInited)
+            {
+                _cachedConstruction.IsProcessed = false;
+            }
             _cachedConstruction.Rods = Rods.ToList<Rod>();
             _cachedConstruction.Strains = Strains.ToList<Strain>();
             _cachedConstruction.HasLeftSupport = (SupportsMode == SupportMode.Both || SupportsMode == SupportMode.Left);

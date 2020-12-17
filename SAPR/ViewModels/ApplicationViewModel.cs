@@ -76,7 +76,8 @@ namespace SAPR.ViewModels
                   {
                       SwitchToPanel(new Processor(), _processorViewModel);
                       _processorViewModel.IsActive = true;
-                  }));
+                  },
+                  (obj) => _construction.IsValid()));
             }
         }
 
@@ -91,7 +92,8 @@ namespace SAPR.ViewModels
                       // CurrentModeTemplate = new Postprocessor();
                       MessageBox.Show("Not yet implemented");
                       _processorViewModel.IsActive = false;
-                  }));
+                  },
+                  (obj) => _construction.IsValid()));
             }
         }
 
