@@ -92,7 +92,11 @@ namespace SAPR.ViewModels
             calculationReport.Clear();
             #region Reaction matrix
             var reactionMatrix = Matrix<double>.Build.Sparse(cachedConstruction.Rods.Count + 1, cachedConstruction.Rods.Count + 1, 0);
-            
+            concentratedStrains = cachedConstruction.Strains.Where(strain => strain.StrainType == StrainType.Concentrated).ToList();
+            concentratedStrains = ReshapeConcentratedStrains(concentratedStrains, cachedConstruction.Rods.Count);
+            lengthwiseStrains = cachedConstruction.Strains.Where(strain => strain.StrainType == StrainType.Lengthwise).ToList();
+            lengthwiseStrains = ReshapeLengthwiseStrains(lengthwiseStrains, cachedConstruction.Rods.Count);
+
             var blocks = new List<Matrix<double>>();
 
             //Fill reaction matrix
@@ -142,9 +146,12 @@ namespace SAPR.ViewModels
                 {
                     reactionMatrix[cachedConstruction.Rods.Count, i] = reactionMatrix[i, cachedConstruction.Rods.Count] = 0;
                 }
-            }     
+            }
 
-            if (cachedConstruction.Rods.Count == 1) reactionMatrix[0, 1] = reactionMatrix[1, 0] = 0;
+            if (cachedConstruction.Rods.Count == 1)
+            {
+                reactionMatrix[0, 1] = reactionMatrix[1, 0] = 0;
+            }
 
             calculationReport.Add($"Матрица реакций:\n{reactionMatrix.ToMatrixString()}");
             #endregion
@@ -168,7 +175,7 @@ namespace SAPR.ViewModels
                 if (i > 0 && i < cachedConstruction.Rods.Count)
                 {
                     reactionVector[i] = concentratedStrains[i].Magnitude + lengthwiseStrains[i].Magnitude * 
-                        cachedConstruction.Rods[i].Length / 2 + lengthwiseStrains[i - 1].Magnitude * cachedConstruction.Rods[i].Length / 2;
+                        cachedConstruction.Rods[i].Length / 2 + lengthwiseStrains[i - 1].Magnitude * cachedConstruction.Rods[i - 1].Length / 2;
                 }
 
                 if (i == 0)
@@ -178,7 +185,7 @@ namespace SAPR.ViewModels
 
                 if (i == cachedConstruction.Rods.Count) 
                 {
-                    reactionVector[i] = concentratedStrains[i].Magnitude + lengthwiseStrains[i - 1].Magnitude * cachedConstruction.Rods[i].Length / 2;
+                    reactionVector[i] = concentratedStrains[i].Magnitude + lengthwiseStrains[i - 1].Magnitude * cachedConstruction.Rods[i - 1].Length / 2;
                 }
             }
 

@@ -17,6 +17,9 @@ namespace SAPR.ViewModels
         private string _currentFilePath = null;
         private PreprocessorViewModel _preprocessorViewModel = null;
         private ProcessorViewModel _processorViewModel = null;
+        private PostprocessorViewModel _postprocessorViewModel = null;
+
+        private Postprocessor _postprocessor = null;
 
         public UserControl _currentModeTemplate;
         public UserControl CurrentModeTemplate
@@ -34,6 +37,8 @@ namespace SAPR.ViewModels
             _construction = new Construction();
             _preprocessorViewModel = new PreprocessorViewModel(_construction);
             _processorViewModel = new ProcessorViewModel(_construction);
+            _postprocessorViewModel = new PostprocessorViewModel(_construction, _processorViewModel);
+            _postprocessor = new Postprocessor();
             SwitchToPanel(new Preprocessor(), _preprocessorViewModel);
         }
 
@@ -89,11 +94,11 @@ namespace SAPR.ViewModels
                 return _postprocessorCommand ??
                   (_postprocessorCommand = new RelayCommand(o =>
                   {
-                      // CurrentModeTemplate = new Postprocessor();
-                      MessageBox.Show("Not yet implemented");
+                      SwitchToPanel(_postprocessor, _postprocessorViewModel);
                       _processorViewModel.IsActive = false;
+                      _postprocessorViewModel.UpdatePostProcessor(_construction);
                   },
-                  (obj) => _construction.IsValid()));
+                  (obj) => _construction.IsProcessed));
             }
         }
 
@@ -213,6 +218,7 @@ namespace SAPR.ViewModels
 
                 _preprocessorViewModel.UpdatePreprocessor(_construction);
                 _processorViewModel.UpdateProcessor(_construction);
+                _postprocessorViewModel.UpdatePostProcessor(_construction);
                 SwitchToPanel(new Preprocessor(), _preprocessorViewModel);
             }
         }

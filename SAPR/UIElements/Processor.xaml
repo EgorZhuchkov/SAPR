@@ -28,6 +28,8 @@
 
         <GridSplitter Grid.Column="1" Width="2" HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
 
-        <TextBlock Grid.Column="2" Text="{Binding ProcessorData}"/>
+        <ScrollViewer Grid.Column="2">
+            <TextBlock Text="{Binding ProcessorData}"/>
+        </ScrollViewer>
     </Grid>
 </UserControl>

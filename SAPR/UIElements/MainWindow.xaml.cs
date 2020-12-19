@@ -26,6 +26,12 @@ namespace SAPR
             InitializeComponent();
 
             DataContext = new ApplicationViewModel();
+            this.MouseDown += MainWindow_MouseDown;
+        }
+
+        private void MainWindow_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Keyboard.ClearFocus();
         }
     }
 }

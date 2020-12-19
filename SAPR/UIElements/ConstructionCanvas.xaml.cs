@@ -142,7 +142,7 @@ namespace SAPR.UIElements
                 {
                     for (int j = 0; j < numberOfArrows; j++)
                     {
-                        var strain = _strains.First(strain => strain.NodeIndex - 1 == i);
+                        var strain = lengthwiseStrains.First(strain => strain.NodeIndex - 1 == i);
                         var strainArrow = new Path
                         {
                             Data = Geometry.Parse("M 0,115 60,115 35,90 100,120 35,150 60,125 0,125 Z"),

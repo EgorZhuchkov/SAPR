@@ -1,0 +1,94 @@
+﻿<UserControl x:Class="SAPR.UIElements.Postprocessor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:SAPR.UIElements"
+             xmlns:oxy="http://oxyplot.org/wpf"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800" Background="White">
+    
+    <UserControl.Resources>
+        
+    </UserControl.Resources>
+
+    <TabControl TabStripPlacement="Left">
+        <TabItem Header="Результаты расчета">
+            <DockPanel>
+                <DockPanel Margin="5" DockPanel.Dock="Top">
+                    <TextBlock Text="Частота дискретизации: " DockPanel.Dock="Left"/>
+                    <TextBox MinWidth="75" Margin="5,0,10,0" DockPanel.Dock="Left">
+                        <TextBox.Text>
+                            <Binding Path="SamplingFrequency" UpdateSourceTrigger="PropertyChanged" Delay="1000">
+                                <Binding.ValidationRules>
+                                    <ExceptionValidationRule/>
+                                    <DataErrorValidationRule/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
+                    <TextBlock Text="Номер стержня: " DockPanel.Dock="Left"/>
+                    <ComboBox ItemsSource="{Binding AvaliableRodIndexes}" SelectedItem="{Binding CurrentRodIndex}" Margin="5,0,10,0" DockPanel.Dock="Left"  MinWidth="75"/>
+                    <Button Content="Выгрузить" Command="{Binding SaveTableCommand}" Padding="5,0,5,0" DockPanel.Dock="Right" MaxWidth="75" HorizontalAlignment="Right"/>
+                </DockPanel>
+
+                <DataGrid DockPanel.Dock="Bottom" AutoGenerateColumns="False" ItemsSource="{Binding CalculationResults}" IsReadOnly="True">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="X" Binding="{Binding X}" Width="*"/>
+                        <DataGridTextColumn Header="N(x)" Binding="{Binding Nx}" Width="*"/>
+                        <DataGridTextColumn Header="U(x)" Binding="{Binding Ux}" Width="*"/>
+                        <DataGridTextColumn Header="Sigma(x)" Binding="{Binding SigmaX}" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </DockPanel>
+        </TabItem>
+        
+        <TabItem Header="Сечение">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="5">
+                    <TextBlock Text="Позиция сечения: "/>
+                    <TextBox MinWidth="75" Margin="5 0 10 0">
+                        <TextBox.Text>
+                            <Binding Path="SectionPosition" UpdateSourceTrigger="PropertyChanged" Delay="1000">
+                                <Binding.ValidationRules>
+                                    <ExceptionValidationRule/>
+                                    <DataErrorValidationRule/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
+                    <TextBlock Text="Номер стержня: "/>
+                    <ComboBox ItemsSource="{Binding AvaliableRodIndexes}" SelectedItem="{Binding SliceRodIndex}" Margin="5 0 10 0" MinWidth="75"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="5" DockPanel.Dock="Top">
+                    <TextBlock Text="N(x) = "/>
+                    <TextBlock Margin="5 0 10 0" Text="{Binding SectionNx}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="5" DockPanel.Dock="Top">
+                    <TextBlock Text="U(x) = "/>
+                    <TextBlock Margin="5 0 10 0" Text="{Binding SectionUx}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="5" DockPanel.Dock="Top">
+                    <TextBlock Text="Sigma(x) = "/>
+                    <TextBlock Margin="5 0 10 0" Text="{Binding SectionSigmaX}"/>
+                </StackPanel>
+            </StackPanel>
+            
+        </TabItem>
+            
+        <TabItem Header="Эпюры">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" >
+                    <TextBlock Text="Номер стержня: "/>
+                    <ComboBox ItemsSource="{Binding AvaliableRodIndexes}" SelectedItem="{Binding DiagramRodIndex}" Margin="5 0 10 0" MinWidth="75"/>
+                    <TextBlock Text="Вид эпюры: "/>
+                    <ComboBox ItemsSource="{Binding PlotModes}" MinWidth="75" SelectedItem="{Binding CurrentPlotMode, Mode=TwoWay}"/>
+                    <Button MinWidth="50" Command="{Binding TestCommand}" />
+                </StackPanel>
+
+                <oxy:PlotView Model="{Binding DiagramModel}" Height="Auto"/>
+
+            </StackPanel>
+        </TabItem>
+    </TabControl>
+</UserControl>
