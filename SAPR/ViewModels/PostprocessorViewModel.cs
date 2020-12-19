@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using OxyPlot.Series;
 using SAPR.ConstructionUtils;
+using SAPR.UIElements;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -54,6 +55,12 @@ namespace SAPR.ViewModels
             {
                 _sliceRodIndex = value;
                 OnPropertyChanged("SliceRodIndex");
+                if (_sectionPosition >= 0.0f && _sectionPosition <= _construction.Rods[_currentRodIndex - 1].Length)
+                {
+                    OnPropertyChanged("SectionUx");
+                    OnPropertyChanged("SectionNx");
+                    OnPropertyChanged("SectionSigmaX");
+                }
             }
         }
 
@@ -98,10 +105,6 @@ namespace SAPR.ViewModels
             set
             {
                 _currentPlotMode = value;
-                if(_construction.IsProcessed)
-                {
-                    PlotDiagram();
-                }
             }
         }
 
@@ -112,12 +115,9 @@ namespace SAPR.ViewModels
             set
             {
                 _diagramRodIndex = value;
-                PlotDiagram();
                 OnPropertyChanged("DiagramRodIndex");
             }
         }
-
-        public OxyPlot.PlotModel DiagramModel { get; set; }
 
         #region Commands
 
@@ -129,7 +129,7 @@ namespace SAPR.ViewModels
                 return _testCommand ??
                   (_testCommand = new RelayCommand(obj =>
                   {
-                      MessageBox.Show(DiagramModel.Series.ToString());
+                      //MessageBox.Show(DiagramModel.Series.ToString());
                   }));
             }
         }
@@ -143,6 +143,20 @@ namespace SAPR.ViewModels
                   (_saveTableCommand = new RelayCommand(obj =>
                   {
                       SaveTableToFile();
+                  }));
+            }
+        }
+
+        private RelayCommand _showPlotCommand;
+        public RelayCommand ShowPlotCommand
+        {
+            get
+            {
+                return _showPlotCommand ??
+                  (_showPlotCommand = new RelayCommand(obj =>
+                  {
+                      var plotWindow = new PlotWindow(_currentPlotMode, _processor, _diagramRodIndex - 1, _construction);
+                      plotWindow.Show();
                   }));
             }
         }
@@ -192,8 +206,6 @@ namespace SAPR.ViewModels
                 "Sigma(x)"
             };
             CurrentPlotMode = "N(x)";
-
-            DiagramModel = new OxyPlot.PlotModel();
         }
 
         public void UpdatePostProcessor(Construction construction)
@@ -206,12 +218,11 @@ namespace SAPR.ViewModels
             {
                 AvaliableRodIndexes.Add(i + 1);
             }
-            _currentRodIndex = 1;
-            _diagramRodIndex = 1;
-            _sliceRodIndex = 1;
+            CurrentRodIndex = 1;
+            DiagramRodIndex = 1;
+            SliceRodIndex = 1;
 
             RecalculateResults();
-            PlotDiagram();
         }
 
         public void RecalculateResults()
@@ -236,32 +247,6 @@ namespace SAPR.ViewModels
                 });
                 currentX += _samplingFrequency;
             }
-        }
-
-        public void PlotDiagram()
-        {
-            DiagramModel.Series.Clear();
-            Func<double, double> plotFunc;
-            switch (_currentPlotMode)
-            {
-                case "U(x)":
-                    plotFunc = value => _processor.GetU(value, _diagramRodIndex - 1);
-                    break;
-                case "N(x)":
-                    plotFunc = value => _processor.GetN(value, _diagramRodIndex - 1);
-                    break;
-                case "Sigma(x)":
-                    plotFunc = value => _processor.GetSigma(value, _diagramRodIndex - 1);
-                    break;
-                default:
-                    throw new ArgumentException();
-            }
-
-            DiagramModel.Series.Add(new FunctionSeries(plotFunc, 0, _construction.Rods[_diagramRodIndex - 1].Length, 0.01));
-            DiagramModel.Title = _currentPlotMode;
-
-            DiagramModel.InvalidatePlot(true);
-            OnPropertyChanged("DiagramModel");
         }
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged([CallerMemberName] string prop = "")

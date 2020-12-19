@@ -11,7 +11,7 @@ using System.Windows;
 
 namespace SAPR.ViewModels
 {
-    class ProcessorViewModel : INotifyPropertyChanged
+    public class ProcessorViewModel : INotifyPropertyChanged
     {
         public bool IsActive { set { OnPropertyChanged("ProcessorData"); } }
         private List<string> calculationReport = new List<string>();

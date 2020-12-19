@@ -82,12 +82,9 @@
                     <TextBlock Text="Номер стержня: "/>
                     <ComboBox ItemsSource="{Binding AvaliableRodIndexes}" SelectedItem="{Binding DiagramRodIndex}" Margin="5 0 10 0" MinWidth="75"/>
                     <TextBlock Text="Вид эпюры: "/>
-                    <ComboBox ItemsSource="{Binding PlotModes}" MinWidth="75" SelectedItem="{Binding CurrentPlotMode, Mode=TwoWay}"/>
-                    <Button MinWidth="50" Command="{Binding TestCommand}" />
+                    <ComboBox ItemsSource="{Binding PlotModes}" MinWidth="75" SelectedItem="{Binding CurrentPlotMode, Mode=TwoWay}" Margin="5 0 10 0"/>
+                    <Button MinWidth="150" Margin="5 0 10 0" Content="Отобразить график" Command="{Binding ShowPlotCommand}" />
                 </StackPanel>
-
-                <oxy:PlotView Model="{Binding DiagramModel}" Height="Auto"/>
-
             </StackPanel>
         </TabItem>
     </TabControl>

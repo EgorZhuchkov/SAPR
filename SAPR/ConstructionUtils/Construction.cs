@@ -7,7 +7,7 @@ using System.Text;
 
 namespace SAPR.ConstructionUtils
 {
-    class Construction
+    public class Construction
     {
         public List<Rod> Rods;
         public List<Strain> Strains;
