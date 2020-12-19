@@ -31,6 +31,16 @@ namespace SAPR.ViewModels
                 OnPropertyChanged("CurrentModeTemplate");
             }
         }
+        private string _windowTitle = "SAPR";
+        public string WindowTitle
+        {
+            get { return _windowTitle; }
+            set
+            {
+                _windowTitle = value;
+                OnPropertyChanged("WindowTitle");
+            }
+        }
 
         public ApplicationViewModel()
         {
@@ -200,6 +210,8 @@ namespace SAPR.ViewModels
                 string serializedConstruction = JsonConvert.SerializeObject(_construction);
                 File.WriteAllText(saveFileDialog.FileName, serializedConstruction);
 
+                WindowTitle = $"SAPR - {saveFileDialog.FileName}";
+
                 _currentFilePath = saveFileDialog.FileName;
             }
         }
@@ -215,6 +227,7 @@ namespace SAPR.ViewModels
 
                 _construction = JsonConvert.DeserializeObject<Construction>(serializedConstruction);
                 _currentFilePath = openFileDialog.FileName;
+                WindowTitle = $"SAPR - {openFileDialog.FileName}";
 
                 _preprocessorViewModel.UpdatePreprocessor(_construction);
                 _processorViewModel.UpdateProcessor(_construction);

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SAPR"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800"
+        Title="{Binding WindowTitle}" Height="450" Width="800"
         FocusManager.FocusedElement="{Binding CurrentFocus}">
     <Window.InputBindings>
         <KeyBinding Command="{Binding SaveCommand}" Modifiers="Control" Key="S"/>
